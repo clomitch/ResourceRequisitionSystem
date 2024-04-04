@@ -1,6 +1,5 @@
 import mysql.connector
 import Availability
-#import Request ALL SELECT STATMENTS NEED TO RETURN THEIR DATA
 
 class DBController:
 
@@ -53,6 +52,30 @@ class DBController:
             return "Equipment added Successfully"
         except Exception as e:
             return "Error\nEquipment not added"
+
+    # Record student staff availability
+    def addAvailability(self,sid,stime,etime,dow):
+        # Add availability to dictionary structure
+        for i in range(etime[1]-stime[1]):
+            for j in range(4):
+                if etime+j != 60:
+                    self.savail[dow].addSATavail(sid,(stime[0]+i,stime[1]+j))
+        # Add to the database
+        try: 
+            cnx = mysql.connector.connect(user='project_user', password='password',
+                                    host='localhost',
+                                    auth_plugin='mysql_native_password',
+                                    database='projectdb')
+            crsr = cnx.cursor()
+            crsr.execute(f'INSERT INTO SATAvailability (StudentID,DayOfWeek,StartTime,Endtime) VALUES ({sid}, "{dow}",{stime},{etime});')
+            
+            cnx.commit()
+            crsr.close()
+            cnx.close()
+            return "Availability added Successfully"
+        except Exception as e:
+            return "Error\nDatabase was not updated"
+
 
     '''
     Functions to remove entries in database tables
@@ -186,6 +209,23 @@ class DBController:
         except Exception as e:
             return "Error"
 
+    # Get the StudentID of the Student with name, name
+    def getSATn(self,name):
+        try: 
+            cnx = mysql.connector.connect(user='project_user', password='password',
+                                    host='localhost',
+                                    auth_plugin='mysql_native_password',
+                                    database='projectdb')
+            crsr = cnx.cursor()
+            crsr.execute(f'SELECT StudentID FROM StudentStaff WHERE FirstName = {name[0]} AND LastName = {name[1]};')
+            sat = crsr.fetchone()[0]
+            
+            crsr.close()
+            cnx.close()
+            return sat
+        except Exception as e:
+            return "Error"
+
     # Get all requests with the SAT with sid assigned
     def gets_request(self,sid):
         try: 
@@ -262,6 +302,23 @@ class DBController:
         except Exception as e:
             return "Error"
         
+    # Get building of a request
+    def get_Building(self,rid):
+        try: 
+            cnx = mysql.connector.connect(user='project_user', password='password',
+                                    host='localhost',
+                                    auth_plugin='mysql_native_password',
+                                    database='projectdb')
+            crsr = cnx.cursor()
+            crsr.execute(f'SELECT Building FROM Requests WHERE RID = {rid};')
+            bl = crsr.fetchone()[0]
+
+            crsr.close()
+            cnx.close()
+            return bl
+        except Exception as e:
+            return "Error"
+
     '''
     Functions to retrive resource availabilty
     '''

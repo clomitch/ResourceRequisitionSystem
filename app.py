@@ -49,7 +49,7 @@ def delete_student_staff(id):
 App routes for the Lecturer page
 '''
 # Submit Support request
-app.route('/schedule_tech_item', methods=['POST'])
+app.route('/submit_request', methods=['POST'])
 def schedule_tech_item():
     # Extracting form data
     data = {

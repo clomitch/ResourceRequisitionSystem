@@ -25,6 +25,9 @@ class Availability:
         for t in self.avail.keys():
             self.avail[t] += [rsrc]
     
+    def addSATavail(self,sid,time):
+        self.avail[time] += [sid]
+
     def getAvailable(self,time):
         return self.avail[time]
     
