@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Item Scheduling</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="uwi">
+        <img src="img/UWI_logo.png" alt="UWI Logo">
+        <h1>University of the West Indies Mona</h1>
+    </div>
+
+<!--    <div class="faculty-heading">
+        <h2>Faculty of Social Sciences</h2>
+    </div>
+-->
+
+    <div class="container">
+        <h1>Tech Item Scheduling</h1>
+        <form id="schedulingForm">
+            <div class="form-group">
+                <label for="requestType">Request Type:</label>
+                <select id="requestType" name="requestType">
+                    <option value="faculty">Update</option>
+                    <option value="student">New</option>
+                    <option value="other">Cancellation</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <select id="title" name="title">
+                    <option value="Mr">Mr</option>
+                    <option value="Ms">Ms</option>
+                    <option value="Mrs">Mrs</option>
+                    <option value="Dr">Dr</option>
+                    <option value="Prof">Prof</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="fullName">Full Name:</label>
+                <input type="text" id="fullName" name="fullName" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="mobile">Mobile Number:</label>
+                <input type="tel" id="mobile" name="mobile" required>
+            </div>
+            <div class="form-group">
+                <label for="department">Department/Unit:</label>
+                <input type="text" id="department" name="department" required>
+            </div>
+            <div class="form-group">
+                <label for="courseOrEvent">Course Code/Name of Event:</label>
+                <input type="text" id="courseOrEvent" name="courseOrEvent" required>
+            </div>
+            <div class="form-group">
+                <label for="roomAssigned">Room Assigned:</label>
+                <input type="text" id="roomAssigned" name="roomAssigned" required>
+            </div>
+            <div class="form-group">
+                <label for="dayOfWeek">Day of the Week:</label>
+                <input type="text" id="dayOfWeek" name="dayOfWeek" required>
+            </div>
+            <div class="form-group">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" name="startDate" required>
+            </div>
+            <div class="form-group">
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" name="endDate" required>
+            </div>
+            <div class="form-group">
+                <label for="startTime">Start Time:</label>
+                <input type="time" id="startTime" name="startTime" required>
+            </div>
+            <div class="form-group">
+                <label for="endTime">End Time:</label>
+                <input type="time" id="endTime" name="endTime" required>
+            </div>
+            <div class="form-group">
+                <label for="equipmentRequest">Equipment Request:</label>
+                <select id="equipmentRequest" name="equipmentRequest">
+                    <option value="FSS Laptop">FSS Laptop</option>
+                    <option value="Data Projector">Data Projector</option>
+                    <option value="Microphone (G102 only)">Microphone (G102 only)</option>
+                    <option value="VGA Cable (male to male)">VGA Cable (male to male)</option>
+                    <option value="VGA Cable (male to female)">VGA Cable (male to female)</option>
+                    <option value="HDMI to VGA Converter">HDMI to VGA Converter</option>
+                    <option value="Speakers">Speakers</option>
+                    <option value="None">None</option>
+                </select>
+            </div>            
+            <!-- Add more form fields as needed -->
+
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</body>
+</html>

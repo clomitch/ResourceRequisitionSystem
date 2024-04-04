@@ -1,0 +1,132 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f8f8;
+    color: #333;
+    background-image: url('img/UWI.png'); /* Add background image */
+    background-size: cover; /* Ensure the background image covers the entire body */
+    background-position: center; /* Center the background image */
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('img/UWI.png'); /* Adjust the path to the image file and gradient opacity */
+    background-size: cover;
+    background-position: center;
+    z-index: -1; /* Place the overlay behind other content */
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    font-family: 'Times New Roman', Times, serif;
+    color: #c43030; /* red */
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+input[type="submit"] {
+    background-color: #c43030; /* orange */
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #c43030; /* darker orange on hover */
+}
+
+
+.uwi {
+    text-align: center;
+    margin-bottom: 20px; /* Add some spacing between the UWI logo and the faculty heading */
+    background-color: #c43030; /* red */
+    padding: 20px; /* Increase padding to expand the red background */
+    margin-top: 0; /* Remove default top margin */
+    margin-left: 0; /* Remove default left margin */
+    margin-right: 0; /* Remove default right margin */
+    margin-bottom: 0; /* Remove default bottom margin */
+}
+
+.uwi img {
+    width: 100px; /* Set the width of the UWI logo */
+    height: auto; /* Maintain the aspect ratio */
+}
+
+.uwi h1 {
+    color: #ffffff; /* black */
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 24px; /* Adjust the font size as needed */
+}
+
+/* Additional form fields */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+    color: #333; /* Dark text color */
+}
+
+input[type="text"],
+input[type="date"],
+input[type="time"],
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+select:focus {
+    outline: none;
+    border-color: #c43030; /* orange on focus */
+}
+
+input[type="submit"] {
+    background-color: #c43030; /* orange */
+    color: #fff; /* white */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #cc5500; /* darker orange on hover */
+}
+

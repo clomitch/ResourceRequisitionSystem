@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCT Page - Equipment and Student Staff Management</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <img src="uwilogo.png" alt="SCT Logo" id="logo">
+        <h1 id="pageTitle">Equipment and Student Staff Management</h1>
+    </header>
+
+    <main>
+        <section>
+            <h2>Manage Equipment</h2>
+            <table id="equipmentTable">
+                <thead>
+                    <tr>
+                        <th>Equipment</th>
+                        <th>Quantity</th>
+                        <th>Specifications</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="equipmentList">
+                </tbody>
+            </table>
+            <button id="equipmentButton" class="addEquipmentButton">Add Equipment</button>
+        </section>
+
+        <section>
+            <h2>Manage Student Staff</h2>
+            <table id="studentStaffTable">
+                <thead>
+                    <tr>
+                        <th>Student Staff</th>
+                        <th>Contact Information</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="studentStaffList">
+                </tbody>
+            </table>
+            <button id="studentStaffButton" class="addStudentStaffButton">Add Student Staff</button>
+        </section>
+    </main>
+
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p id="modalContent"></p>
+        <input type="text" id="modalInput" />
+        <button id="modalOk">OK</button>
+        <button id="modalCancel">Cancel</button>
+      </div>
+    </div>
+    
+
+    <script src="script.js"></script>
+</body>
+</html>

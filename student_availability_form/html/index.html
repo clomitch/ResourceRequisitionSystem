@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Staff Availability Form</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="university-bar">
+        University of the West Indies Mona
+    </div>
+    <header>
+        <div class="logo-container">
+            <img src="path_to_university_logo.png" alt="University Logo">
+        </div>
+        <nav>
+            <!-- Navigation items here -->
+        </nav>
+    </header>
+
+    <main>
+        <section class="form-container">
+            <h1>Student Staff Availability Submission</h1>
+            <form id="availabilityForm">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" placeholder="Your Name" required>
+                
+                <label for="dateInputsContainer">Enter Available Times:</label>
+                <div id="dateInputsContainer">
+                    <!-- JavaScript will populate this -->
+                </div>
+                <button type="button" id="addMoreDates">Add More Dates</button>
+            
+                <label for="comments">Additional Comments:</label>
+                <textarea id="comments" name="comments" placeholder="Additional Comments"></textarea>
+            
+                <button type="submit" id="submit">Submit</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <!-- Contact information and links -->
+    </footer>
+<script src="../js/script.js"></script>
+</body>
+</html>
