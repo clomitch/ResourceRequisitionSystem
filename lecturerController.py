@@ -99,6 +99,7 @@ class lecturerController:
         else:       
             return 0
         
+    # Create a similar version to allocate SAT to lab duties
     def allocateR(self,rid,stime,etime,elst,dow):
         lst = self.getEquip(stime,etime,elst)
         sat = self.getSAT(stime,dow)

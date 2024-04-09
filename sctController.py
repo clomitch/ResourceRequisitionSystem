@@ -43,3 +43,6 @@ class sctContoller:
         else:
             return False
             #notify the SCT 
+
+    def assignToLab(self,dow):
+        pass
