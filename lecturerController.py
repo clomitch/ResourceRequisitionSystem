@@ -5,6 +5,7 @@ class lecturerController:
     def __new__(self):
         if not hasattr(self, 'instance'):
             self.instance = super(lecturerController, self).__new__(self)
+            self.dis = {}
         return self.instance
 
     def getEquip(self,stime,etime,elst,dow):
@@ -25,6 +26,31 @@ class lecturerController:
         for eq in eavail:
             elst += [eq[0]]
         return elst
+
+    # find the short distance between the buildings
+    def findDistance(self):
+        graph = DBController.getMap()
+        nodes = DBController.get_allBuildings()
+
+        # Dijktra algorithm to find the shortest path from one building to all others
+        for nd in nodes:
+            visited = []
+            distance = [[nd,0]]
+            while visited != nodes:
+                distance.sort(key = lambda x:x[1])
+                curr = distance[0]
+                if curr not in visited:
+                    visited += [curr[0]]
+                    for edge in graph:
+                        if edge[0] == curr[0]:
+                            distance += [[edge[0],edge[2]+curr[1]]]
+                        elif edge[1] == curr[0]:
+                            distance += [[edge[1],edge[2]+curr[1]]]
+            self.dis[nd] = {k:v for [k,v] in distance}
+
+    # Get shortest distance between two buildings
+    def getDistance(self,b1,b2):
+        return self.dis[b1][b2]
 
     def reshuffleSAT(self,rid,stime,dow,dtype):
         # Get the building the duty will be on
@@ -57,7 +83,7 @@ class lecturerController:
             # get the distance between the buildings
             dlst = []
             for i in range(len(b)-1):
-                for j in range(i+1,len(b)):
+                for j in range(i+1,len(b)):     # getDistance in this class now
                     dlst += [([b[i],b[j]],DBController.getDistance(b[i],b[j]))]
 
             # sort by distance in ascending order
@@ -116,5 +142,7 @@ class lecturerController:
             return self.reshuffleSAT(rid,etime,dow,'PU')
         
     # Cancellation of a request
+    def cancel_request(self):
+        pass
         
     # Updating a request

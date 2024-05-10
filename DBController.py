@@ -268,16 +268,33 @@ class DBController:
         except Exception as e:
             return "Error"
         
-    # Get Distance between buildings
-    def getDistance(self,bldng1,bldng2):
+    # Get graph of UWI Campus
+    def getMap(self):
         try: 
             cnx = mysql.connector.connect(user='project_user', password='password',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
             crsr = cnx.cursor()
-            crsr.execute(f'SELECT Distance FROM Map WHERE (Building1 = "{bldng1}" AND Building2 = "{bldng2}") OR (Building1 = "{bldng2}" AND Building2 = "{bldng1}");')
-            dis = crsr.fetchone[0]
+            crsr.execute(f'SELECT * FROM Map;')
+            dis = crsr.fetchall()
+            
+            crsr.close()
+            cnx.close()
+            return dis
+        except Exception as e:
+            return "Error"
+
+    # Get all the buildings with supported rooms
+    def get_allBuildings(self):
+        try: 
+            cnx = mysql.connector.connect(user='project_user', password='password',
+                                    host='localhost',
+                                    auth_plugin='mysql_native_password',
+                                    database='projectdb')
+            crsr = cnx.cursor()
+            crsr.execute(f'SELECT Distinct Building FROM RoomsSupported;')
+            dis = crsr.fetchall()
             
             crsr.close()
             cnx.close()

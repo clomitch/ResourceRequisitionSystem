@@ -29,8 +29,8 @@ CREATE TABLE Lecturer(
 CREATE TABLE SATAvailability(
     StudentID int FOREIGN KEY REFERENCES StudentStaff,
     DayOfWeek varchar(10),
-    StartTime datetime,
-    EndTime datetime
+    StartTime time,
+    EndTime time
 );
 
 -- Support Request Table
@@ -39,9 +39,9 @@ CREATE TABLE Request(
     LecturerID int FOREIGN KEY REFERENCES Lecturer,
     ClassLocation VARCHAR(50),
     DayOfWeek varchar(10),
-    StartTime DATETIME,
-    EndTime DATETIME
-);
+    StartTime time,
+    EndTime time
+); -- include a start date and end date 
 
 -- Equipment Assignment Table
 CREATE TABLE EquipmentAssignment(
@@ -55,8 +55,8 @@ CREATE TABLE SATAssignment(
     RID int FOREIGN KEY REFERENCES Request
     sType varchar(2),
     DayOfWeek varchar(10),
-    StartTime datetime,
-    EndTime datetime
+    StartTime time,
+    EndTime time
 );
 
 -- Locations or Rooms supported link each room to a building
