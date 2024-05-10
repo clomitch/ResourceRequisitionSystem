@@ -34,15 +34,27 @@ class sctContoller:
         return DBController.removeSAT(sid)
 
     # Allocate new equipment to a request
-    def equip_reallocate(self,rid,etype,stime,etime,dow):
-        # use the usual allocate function to allocate the equipment 
-        evail = lecturerController.get_Equip(stime,etime,[etype],dow)
-        if evail != False:
-            DBController.assignEquip(rid,evail[0],stime,etime,dow)
+    def equip_reallocate(self, rid, etype, stime, etime, dow):
+        evail = lecturerController.get_Equip(stime, etime, [etype], dow)
+        if evail:
+            for e in evail:
+                DBController.assignEquip(rid, e, stime, etime, dow)
             return True
         else:
-            return False
-            #notify the SCT 
+            # If the equipment is not available, try to reshuffle
+            return self.reshuffleEquip(rid, etype, stime, etime, dow)
+
+    def reshuffleEquip(self, rid, etype, stime, etime, dow):
+        # Try to find any alternative equipment available at the same time
+        available_equips = DBController.getAvaile(etype, stime, etime, dow)
+        if available_equips:
+            # If found, assign the first available equipment
+            DBController.assignEquip(rid, available_equips[0], stime, etime, dow)
+            print(f"Reshuffle successful: Assigned alternative equipment for Resource ID {rid}, Type {etype}, on {dow}.")
+            return True
+
+        # If no alternative equipment is available return False
+        return False
 
     def assignToLab(self,dow):
         pass
