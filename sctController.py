@@ -56,5 +56,28 @@ class sctContoller:
         # If no alternative equipment is available return False
         return False
 
-    def assignToLab(self,dow):
-        pass
+     def assignSATToLab(self, dow, start_hour, end_hour):
+        """
+        Assign SATs for lab duties each day, in 1-hour increments.
+
+        :param dow: Day of the week
+        :param start_hour: Starting hour of the lab assignment
+        :param end_hour: Ending hour for lab assignments
+        :return: True if the assignments are made, False otherwise
+        """
+        current_hour = start_hour
+        while current_hour < end_hour:
+            # Fetch available SATs for this hour
+            available_sats = DBController.getAvailableSATs(current_hour, dow)
+
+            # If SATs are available, assign each to a 1-hour increment
+            if available_sats:
+                for sat in available_sats:
+                    DBController.assignSATToLab(sat, current_hour, current_hour + 1, dow)
+                current_hour += 1
+            else:
+                print(f"No available SATs found for hour {current_hour} on {dow}")
+                return False
+
+        print(f"SATs assigned for lab duties on {dow} from hour {start_hour} to {end_hour}")
+        return True
