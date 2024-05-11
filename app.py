@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
-import sctController
-import lecturerController
-import satController
+from sctController import sctController
+from lecturerController import lecturerController
+from satController import satController
 import Request
 
 app = Flask(__name__)
@@ -36,7 +36,7 @@ def get_student_staff():
 @app.route('/add_student-staff', methods=['POST'])
 def add_student_staff():
     data = request.get_json()
-    mes = sctController.addSAT(data['StudentID','First Name','Last Name'])
+    mes = sctController.addSAT(data['StudentID'],data['First Name'],data['Last Name'])
     return jsonify({"message": mes})
 
 # Remove SAT
@@ -88,23 +88,15 @@ App routes for the student staff page
 # Submit Available times
 @app.route('/submit_availability', methods=['POST'])
 def submit_availability():
-    # Extract form data
-    name = request.form.get('name')
-    dates = request.form.getlist('dates[]')
-    start_times = request.form.getlist('startTimes[]')
-    end_times = request.form.getlist('endTimes[]')
-    comments = request.form.get('comments')
+    data = request.get_json()
+    
+    mes = satController.submit_time(data['StudentID'],data['StartTime'],data['EndTime'],data['DayOfWeek'])
+    return jsonify({"message": mes})
 
-    # Process the data (here we are just printing it)
-    print("Name:", name)
-    print("Dates:", dates)
-    print("Start Times:", start_times)
-    print("End Times:", end_times)
-    print("Comments:", comments)
-
-    # write functions in satController and DBController to add the new available times
-
-    return jsonify({"success": True, "message": "Availability submitted successfully!"})
+# View Available Times Submitted
+@app.route('/getAvailableTimes/<int:sid>',methods=['GET'])
+def get_times(sid):
+    return satController.getTimesSub(sid)
 
 if __name__ == '__main__':
     app.run(debug=True)

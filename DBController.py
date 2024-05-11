@@ -1,28 +1,36 @@
 import mysql.connector
-import Availability
+from Availability import Availability
 
 class DBController:
+    lavail = {}
+    pavail = {}
+    savail = {}
 
     def __new__(self):
         if not hasattr(self, 'instance'):
             self.instance = super(DBController, self).__new__(self)
         return self.instance
-
-    def __init__(self):
-        self.lavail, self.pavail, self.savail = {}
-        # Equipment Availbility per Day
-        for i in range(6):
-            self.lavail[i] = Availability('Laptop')          # Just laptop and projector for now
-            self.pavail[i] = Availability('Projector')
-            self.savail[i] = Availability('SAT')
-
+    
+    '''def __init__():
+        dows = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+        for day in dows:
+            print("start")
+            DBController.lavail[day] = Availability('Laptop',DBController.getall_equip('Laptop'))
+            DBController.pavail[day] = Availability('Projector',DBController.getall_equip('Laptop'))
+            DBController.savail[day] = Availability('SAT',DBController.getall_equip('Laptop'))
+            print("end")
+        self.lavail = {k: Availability('Laptop',DBController.getall_equip('Laptop')) for k in dows}
+        self.pavail = {k: Availability('Projector',DBController.getall_equip('Projector')) for k in dows}
+        self.savail = {k: Availability('SAT',DBController.getall_satAvail(k)) for k in dows}'''
+    
+    
     ''' 
     Functions to Add entries to database tables
     '''
     # Add new SAT to table Student Staff
-    def addSAT(self,sid,fname,lname):
+    def addSAT(sid,fname,lname):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -37,9 +45,9 @@ class DBController:
             return "Error"
 
     # Add new equipment to table Equipment
-    def addEquip(self,eid,rtype):
+    def addEquip(eid,rtype):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -54,21 +62,27 @@ class DBController:
             return "Error\nEquipment not added"
 
     # Record student staff availability
-    def addAvailability(self,sid,stime,etime,dow):
+    def addAvailability(sid,stime,etime,dow):
         # Add availability to dictionary structure
-        for i in range(etime[1]-stime[1]):
+        stme = [int(x) for x in stime.split(':')]
+        etme = [int(x) for x in etime.split(':')]
+        if DBController.savail == {}:
+            DBController.savail = {k: Availability('SAT',DBController.getall_satAvail(k)) for k in ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']}
+
+        for i in range((etme[0])-stme[0]):
             for j in range(4):
-                if etime+j != 60:
-                    self.savail[dow].addSATavail(sid,(stime[0]+i,stime[1]+j))
+                if etme[1]+(j*15) != 60:
+                    DBController.savail[dow].addSATavail(sid,(stme[0]+i,stme[1]+(j*15)))
         # Add to the database
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
             crsr = cnx.cursor()
-            crsr.execute(f'INSERT INTO SATAvailability (StudentID,DayOfWeek,StartTime,Endtime) VALUES ({sid}, "{dow}",{stime},{etime});')
+            crsr.execute(f'INSERT INTO SATAvailability (StudentID,DayOfWeek,StartTime,EndTime) VALUES ({sid},"{dow}","{stime}","{etime}");')
             
+            print("check")
             cnx.commit()
             crsr.close()
             cnx.close()
@@ -76,14 +90,13 @@ class DBController:
         except Exception as e:
             return "Error\nDatabase was not updated"
 
-
     '''
     Functions to remove entries in database tables
     '''
     # Remove equipment with ID id from the table Equipment
-    def removeEquip(self,id):
+    def removeEquip(id):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -98,9 +111,9 @@ class DBController:
             return "Error \nEquipment not removed"
 
     # Remove SAT with ID id from the table 
-    def removeSAT(self,id):
+    def removeSAT(id):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -117,7 +130,7 @@ class DBController:
     # Remove SAT with ID sid from SATAssignment where request ID is rid
     def removeSATreq(self,sid,rid):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -133,7 +146,7 @@ class DBController:
     # Remove Equipment with ID eid from EquipmentAssignment where request ID is rid
     def removeEquipreq(self,eid,rid):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -150,29 +163,30 @@ class DBController:
     Functions to get data from database tables
     '''
     # Get all equipment of the type specified by rtype, eg: laptop, projector, mouse
-    def getall_equip(self,rtype):
+    def getall_equip(rtype):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
-                                    host='localhost',
-                                    auth_plugin='mysql_native_password',
-                                    database='projectdb')
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24', 
+                                          host='localhost', 
+                                          auth_plugin='mysql_native_password', 
+                                          database='projectdb')
             crsr = cnx.cursor()
-            crsr.execute(f'SELECT EquipmentID FROM Equipment WHERE EType = {rtype};')
+            crsr.execute(f'SELECT * FROM Equipment WHERE EType = "{rtype}";')
             equip = crsr.fetchall()
             elst = []
-            for EquipmentId in equip:
-                elst += [EquipmentId]
+            for equipment in equip:
+                elst += [equipment]
             
             crsr.close()
             cnx.close()
             return elst
         except Exception as e:
+            print(e)
             return "Error"
 
     # Get all SAT from the table Student Staff
-    def getall_sat(self):
+    def getall_sat():
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -187,12 +201,35 @@ class DBController:
             cnx.close()
             return slst
         except Exception as e:
+            print("Error-eq")
             return "Error"
     
+    # Get all SAT available to work on a weekday 
+    def getall_satAvail(dow):
+        try: 
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
+                                    host='localhost',
+                                    auth_plugin='mysql_native_password',
+                                    database='projectdb')
+            crsr = cnx.cursor()
+            crsr.execute(f'SELECT StudentID, StartTime FROM SATAvailability WHERE DayOfWeek = "{dow}" ORDER BY StartTime;')
+            s = crsr.fetchall()
+            slst = {(k,j*15):[] for k in range(7,22) for j in range(4)}
+            for StudentID, StartTime in s:
+                tme = StartTime.split(":")
+                slst[(tme[0],tme[1])] += [StudentID]
+            
+            crsr.close()
+            cnx.close()
+            return slst
+        except Exception as e:
+            print("Error-sat")
+            return "Error"
+
     # Get all requests with the equipment with eid assigned
     def gete_request(self,eid):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -212,7 +249,7 @@ class DBController:
     # Get the StudentID of the Student with name, name
     def getSATn(self,name):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -229,7 +266,7 @@ class DBController:
     # Get all requests with the SAT with sid assigned
     def gets_request(self,sid):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -249,7 +286,7 @@ class DBController:
     # Get requests and their location from Requests
     def getl_request(self,stime,dow):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -271,7 +308,7 @@ class DBController:
     # Get graph of UWI Campus
     def getMap(self):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -288,7 +325,7 @@ class DBController:
     # Get all the buildings with supported rooms
     def get_allBuildings(self):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -305,7 +342,7 @@ class DBController:
     # Get SATs working at a time stime on the day of the week dow
     def gets_working(self,stime,rid):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -322,7 +359,7 @@ class DBController:
     # Get building of a request
     def get_Building(self,rid):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -333,6 +370,30 @@ class DBController:
             crsr.close()
             cnx.close()
             return bl
+        except Exception as e:
+            return "Error"
+
+    def getSubTimes(sid):
+        try: 
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
+                                    host='localhost',
+                                    auth_plugin='mysql_native_password',
+                                    database='projectdb')
+            crsr = cnx.cursor()
+            crsr.execute(f'SELECT * FROM SATAvailability WHERE StudentID = {sid};')
+            bl = crsr.fetchall()
+            tlst = []
+            for StudentID, DayOfWeek, StartTime, EndTime in bl:
+                tme = {}
+                tme['StudentID'] = StudentID
+                tme['DayOfWeek'] = DayOfWeek
+                tme['StartTime'] = str(StartTime)
+                tme['Endtime']  = str(EndTime)
+                tlst += [tme]
+
+            crsr.close()
+            cnx.close()
+            return tlst
         except Exception as e:
             return "Error"
 
@@ -372,7 +433,7 @@ class DBController:
     # Assign SAT with id sid to request with id rid     
     def assignSAT(self,rid,sid,dtype,dow,stime):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
@@ -389,7 +450,7 @@ class DBController:
     # Assign Equipment with id eid to request with id rid  
     def assignEquip(self,rid,eid,stime,etime,dow,rtype):
         try: 
-            cnx = mysql.connector.connect(user='project_user', password='password',
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')

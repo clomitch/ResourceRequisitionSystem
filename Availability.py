@@ -1,5 +1,3 @@
-import DBController
-
 class Availability:
     #Dictionary Implementation
 
@@ -7,19 +5,18 @@ class Availability:
 
     # Time as tuples (hour,minute)
     
-    def __init__(self,rtype):
+    def __init__(self,rtype,rlst):
         #tdy = time.gmtime()
         labels = []
         if rtype == 'SAT':
             for i in range(15):
                 for j in range(4):
                     labels += [(7+i,15*j)]
-            values = DBController.get_satAvail()
+            self.avail = {labels[i]: rlst[labels[i]] for i in range(len(labels))}
         else:
             for i in range(14):
-                labels += [(8+i,0)]
-            values = DBController.getall_equip()
-        self.avail = {labels[i]: values for i in range(len(labels))}
+                #labels += [(8+i,0)]
+                self.avail = {(8+i,0): rlst for i in range(len(labels))}
         
     def addResource(self,rsrc):
         for t in self.avail.keys():

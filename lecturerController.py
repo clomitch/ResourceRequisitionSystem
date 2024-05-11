@@ -1,4 +1,4 @@
-import DBController
+from DBController import DBController
 
 class lecturerController:
 
@@ -57,7 +57,7 @@ class lecturerController:
         bldng = DBController.get_Building(rid)
 
         # Get where staff is working around this time (rid,building)
-        rloc = DBController.getl_request(stime,dow)
+        rloc = DBController.get_dbController().getl_request(stime,dow)
         if rloc == False:
             return False
         rloc += [(rid,bldng)]
