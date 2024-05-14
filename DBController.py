@@ -87,10 +87,10 @@ class DBController:
         # Add availability to dictionary structure
         if DBController.savail == {}:
             DBController.setAvailability()
-        for i in range((etime[0]),stime[0]):
+        for i in range((stime[0]),etime[0]):
             for j in range(4):
                 if stime[1]+(j*15) < 60:
-                    DBController.savail[dow].addSATavail(sid,(stime[0]+i,stime[1]+(j*15)))
+                    DBController.savail[dow].addSATavail(sid,(i,stime[1]+(j*15)))
         
         # Add to the database
         try:
@@ -122,21 +122,24 @@ class DBController:
 
     def addRequest(lid,stime,etime,dow,room,sdate,edate):
         req = Request(lid,stime,etime,dow,room,sdate,edate)
+        rid = req.getID()
+
         try: 
             cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
             crsr = cnx.cursor()
-            rid = req.getID()
-            crsr.execute(f'INSERT INTO Request (RequestID,LecturerID,ClassLocation,DayOfWeek,StartTime,EndTime) VALUES ({rid},{lid},"{room}","{dow}","{stime}","{etime}");')
             
+            crsr.execute(f'INSERT INTO Request (RequestID,LecturerID,ClassLocation,DayOfWeek,StartTime,EndTime,StartDate,EndDate) VALUES ({rid},{lid},"{room}","{dow}","{stime}","{etime}","{sdate}","{edate}");')
+            print("Eh")
             cnx.commit()
             crsr.close()
             cnx.close()
-            print(req.getID())
+           
             return req.getID()
         except Exception as e:
+            print(e)
             return "Error\nDatabase was not updated"
 
 

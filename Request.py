@@ -17,8 +17,8 @@ class Request:
     def nxtRID():
         Request.crid += 1
     
-    def getID():
-        return Request.ID
+    def getID(self):
+        return self.rid
 
     def get_stime(self):
         return self.stime 
