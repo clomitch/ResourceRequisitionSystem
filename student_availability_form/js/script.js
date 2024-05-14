@@ -21,6 +21,33 @@ document.addEventListener('DOMContentLoaded', function() {
         addDateTimeFrameInput();
     });
 
-    // Additional JavaScript for form submission and validation
-    // ...
+    // Handle form submission
+    document.getElementById('availabilityForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+
+        // Prepare data to send to the backend
+        const formData = new FormData(this);
+        
+        // Make a fetch request to submit availability
+        fetch('/submit_availability', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Handle success response
+            console.log(data);
+            
+        })
+        .catch(error => {
+            // Handle error
+            console.error('There was a problem with the fetch operation:', error);
+        });
+    });
+
 });
