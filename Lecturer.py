@@ -13,3 +13,6 @@ class Lecturer:
     @staticmethod
     def nxtID():
         Lecturer.clid += 1
+
+    def getID(self):
+        return self.lid

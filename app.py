@@ -58,7 +58,6 @@ def schedule_tech_item():
         if lid == None:
             lecturerController.addLecturer(data['Title'],data['Full Name'],data['Email'],data['Mobile'])
             lid = lecturerController.getLID(data['Email'])
-        print("LID",lid)
         lecturerController.allocateR(lid,data['Start Time'],data['End Time'],data['Day Of Week'],data["Room Assigned"],data["Start Date"],data['End Date'],data['Equipment Needed'])    
     else:
         lecturerController.cancel_request(data['Day Of Week'],data['Start Time'],data['Room Assigned'])

@@ -65,15 +65,16 @@ class DBController:
  
     # Add new Lecturer data
     def add_lecturer(title,name,email,phone):
-        lid = Lecturer(title,name,email,phone)
+        l = Lecturer(title,name,email,phone)
+        lid = l.getID()
         try: 
             cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
             crsr = cnx.cursor()
-            crsr.execute(f'INSERT INTO Lecturer (LecturerID,flname,Title,Email,Telephone) VALUES ({lid}, "{name}", "{title}", "{email}","{phone}");')
-            
+            crsr.execute(f'INSERT INTO Lecturer (LecturerID,Title,Email,Telephone,FullName) VALUES ({lid}, "{title}", "{email}","{phone}", "{name}");')
+            print("hey")
             cnx.commit()
             crsr.close()
             cnx.close()
@@ -422,6 +423,7 @@ class DBController:
 
             crsr.close()
             cnx.close()
+            print(lid)
             return lid
         except Exception as e:
             return "Error"

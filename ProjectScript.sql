@@ -18,7 +18,7 @@ CREATE TABLE Equipment (
 -- Lecturer Table
 CREATE TABLE Lecturer(
     LecturerID int PRIMARY KEY,
-    flname varchar(100),
+    FullName varchar(100),
     Title varchar(3),
     Email varchar(50),
     Telephone varchar(10)
@@ -173,3 +173,6 @@ INSERT INTO Equipment (EquipmentID,EType) VALUES
     (10,'HDMI Cord');
     
 select * from SATAvailability;
+INSERT INTO SATAvailability (StudentID,DayOfWeek,StartTime,EndTime) VALUES (1,"Monday","08:00:00","12:00:00");
+SELECT RequestID,ClassLocation FROM Request WHERE TIMEDIFF("9:0:00","9:0:00") = 0 AND (DayOfWeek = "Monday");
+DROP table Lecturer;
