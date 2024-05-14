@@ -16,4 +16,6 @@ class satController:
     def remove_availability(sid,stime,dow):
         stme = stime.split(":")
         stme = tuple([int(s) for s in stme])
+        #th = DBController.gets_request(sid)
+        #print(th)
         return DBController.removeAvailability(sid,stime,dow)
