@@ -9,7 +9,7 @@ app = Flask(__name__)
 App routes for the SCT Page
 '''
 # Get all Equipment
-@app.route('/sct_page/get_equipment', methods=['GET'])
+@app.route('/sct_page/script.js/get_equipment', methods=['GET'])
 def get_equipment():
     return sctController.get_equip()
 
