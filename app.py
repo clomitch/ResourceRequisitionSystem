@@ -9,37 +9,37 @@ app = Flask(__name__)
 App routes for the SCT Page
 '''
 # Get all Equipment
-@app.route('/get_equipment', methods=['GET'])
+@app.route('/sct_page/get_equipment', methods=['GET'])
 def get_equipment():
     return sctController.get_equip()
 
 # Add new Equipment
-@app.route('/add_equipment', methods=['POST'])
+@app.route('/sct_page/add_equipment', methods=['POST'])
 def add_equipment():
     data = request.get_json()
     mes = sctController.add_equip(data['EquipmentID'],data['Type'])
     return jsonify({"message": mes})
 
 # Remove Equipment
-@app.route('/remove_equipment/<string:rtype>/<int:id>', methods=['DELETE'])
+@app.route('/sct_page/remove_equipment/<string:rtype>/<int:id>', methods=['DELETE'])
 def delete_equipment(rtype,id):
     mes = sctController.remove_equip(rtype,id)
     return jsonify({"message": mes})
 
 # Get all SAT
-@app.route('/get_student-staff', methods=['GET'])
+@app.route('/sct_page/get_student-staff', methods=['GET'])
 def get_student_staff():
     return sctController.getSAT()
 
 # Add new SAT
-@app.route('/add_student-staff', methods=['POST'])
+@app.route('/sct_page/add_student-staff', methods=['POST'])
 def add_student_staff():
     data = request.get_json()
     mes = sctController.addSAT(data['StudentID'],data['First Name'],data['Last Name'])
     return jsonify({"message": mes})
 
 # Remove SAT
-@app.route('/remove_student-staff/<int:id>', methods=['DELETE'])
+@app.route('/sct_page/remove_student-staff/<int:id>', methods=['DELETE'])
 def delete_student_staff(id):
     mes = sctController.removeSAT(id)
     return jsonify({"message": mes})
