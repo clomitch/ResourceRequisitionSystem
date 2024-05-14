@@ -11,10 +11,10 @@ class Availability:
                 self.avail = {labels[i]:[] for i in range(len(labels))}
             else:
                 self.avail = {labels[i]: [rlst[labels[i]]] for i in range(len(labels))}
-            print(self.avail)
+            #print(self.avail)
         else:
             self.avail = {(i,0): rlst for i in range(8,22)}
-        #print(self.avail)
+        #print(self.ava
         
     def addResource(self,rsrc):
         for t in self.avail.keys():
@@ -24,6 +24,7 @@ class Availability:
         self.avail[time] += [sid]
 
     def getAvailable(self,time):
+        #print(self.avail)
         return self.avail[time]
     
     def markUnavailable(self,time,rsrc):

@@ -54,19 +54,21 @@ def schedule_tech_item():
     #print('got the data')
     # lid,stime,etime,room,sdate,edate          stime,etime,elst,dow)
     if data['Request Type'] == 'New':
-        lid = lecturerController.getLID(data['Email'])      # Needs revision the request class needs more details
-        if lid == 0:
+        lid = lecturerController.getLID(data['Email'])
+        if lid == None:
             lecturerController.addLecturer(data['Title'],data['Full Name'],data['Email'],data['Mobile'])
+            lid = lecturerController.getLID(data['Email'])
+        print("LID",lid)
         lecturerController.allocateR(lid,data['Start Time'],data['End Time'],data['Day Of Week'],data["Room Assigned"],data["Start Date"],data['End Date'],data['Equipment Needed'])    
     else:
         lecturerController.cancel_request(data['Day Of Week'],data['Start Time'],data['Room Assigned'])
         if data['request_type'] == 'Update':
             lecturerController.allocateR(lid,data['Start Time'],data['End time'],data['Day Of Week'],data["Room Assigned"],data["Start Date"],data['End Date'],data['Equipment Needed'])
 
-    return jsonify({"success": True, "message": "Request submitted/nCheck email for denial/approval of your request"})
+    return jsonify({"success": True, "message": "Request submitted\nCheck email for denial/approval of your request"})
 
 # View requests made by a Lecturer
-@app.route('/view_requests/<int:lid>')
+@app.route('/view_requests/<int:lid>',methods=['GET'])
 def viewRequests(lid):
     return lecturerController.viewRequests(lid)
 

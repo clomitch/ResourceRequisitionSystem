@@ -84,28 +84,29 @@ class DBController:
     # Record student staff availability
     def addAvailability(sid,stime,etime,dow):
         # Add availability to dictionary structure
-        stme = [int(x) for x in stime.split(':')]
-        etme = [int(x) for x in etime.split(':')]
         if DBController.savail == {}:
             DBController.setAvailability()
-        for i in range((etme[0])-stme[0]):
+        for i in range((etime[0])-stime[0]):
             for j in range(4):
-                DBController.savail[dow].addSATavail(sid,(stme[0]+i,stme[1]+(j*15)))
+                DBController.savail[dow].addSATavail(sid,(stime[0]+i,stime[1]+(j*15)))
         
         # Add to the database
-        try: 
+        try:
             cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
             crsr = cnx.cursor()
-            crsr.execute(f'INSERT INTO SATAvailability (StudentID,DayOfWeek,StartTime,EndTime) VALUES ({sid},"{dow}","{stime}","{etime}");')
-            
+            stm = str(stime[0])+":"+str(stime[1])+":"+str(stime[2])
+            etm = str(etime[0])+":"+str(etime[1])+":"+str(etime[2])
+            crsr.execute(f'INSERT INTO SATAvailability (StudentID,DayOfWeek,StartTime,EndTime) VALUES ({sid},"{dow}","{stm}","{etm}");')
+        
             cnx.commit()
             crsr.close()
             cnx.close()
             return "Availability added Successfully"
         except Exception as e:
+            #print(e)
             return "Error\nDatabase was not updated"
 
     def addRequest(lid,stime,etime,dow,room,sdate,edate):
@@ -116,11 +117,13 @@ class DBController:
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
             crsr = cnx.cursor()
-            crsr.execute(f'INSERT INTO Request (RequestID,LecturerID,ClassLocation,DayOfWeek,StartTime,EndTime) VALUES ({req.getID()},{lid},"{room}","{dow}","{stime}","{etime}");')
+            rid = req.getID()
+            crsr.execute(f'INSERT INTO Request (RequestID,LecturerID,ClassLocation,DayOfWeek,StartTime,EndTime) VALUES ({rid},{lid},"{room}","{dow}","{stime}","{etime}");')
             
             cnx.commit()
             crsr.close()
             cnx.close()
+            print(req.getID())
             return req.getID()
         except Exception as e:
             return "Error\nDatabase was not updated"
@@ -183,7 +186,8 @@ class DBController:
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
             crsr = cnx.cursor()
-            crsr.execute(f'DELETE from SATAvailability WHERE StudentID = {sid} and StartTime = "{stime}" and DayOfWeek = "{dow}";')
+            stm = str(stime[0])+":"+str(stime[1])+":"+str(stime[2])
+            crsr.execute(f'DELETE from SATAvailability WHERE StudentID = {sid} and StartTime = "{stm}" and DayOfWeek = "{dow}";')
             
             cnx.commit()
             crsr.close()
@@ -277,6 +281,7 @@ class DBController:
             crsr.execute(f'SELECT * FROM StudentStaff;')
             s = crsr.fetchall()
             slst = []
+            print("here")
             for StudentID, FirstName, LastName in s:
                 slst += [(StudentID,FirstName,LastName)]
             
@@ -284,7 +289,6 @@ class DBController:
             cnx.close()
             return slst
         except Exception as e:
-            print("Error-eq")
             return "Error"
 
     # get all requests for a day of the week
@@ -295,11 +299,11 @@ class DBController:
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
             crsr = cnx.cursor()
-            crsr.execute(f'SELECT * FROM Request WHERE DayOfWeek = {dow};')
+            crsr.execute(f'SELECT * FROM Request WHERE DayOfWeek = "{dow}";')
             s = crsr.fetchall()
             slst = []
-            for rid,olid,room,dow,stime,etime in s:
-                slst += [(rid,olid,room,dow,stime,etime)]
+            for rid,olid,room,dow1,stime,etime in s:
+                slst += [(rid,olid,room,dow1,stime,etime)]
             
             crsr.close()
             cnx.close()
@@ -396,7 +400,8 @@ class DBController:
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
             crsr = cnx.cursor()
-            crsr.execute(f'SELECT RequestID FROM Requests WHERE StartTime = "{stime}" and DayOfWeek = "{dow}" and ClassLocation = "{room}";')
+            stm = str(stime[0])+":"+str(stime[1])+":"+str(stime[2])
+            crsr.execute(f'SELECT RequestID FROM Requests WHERE StartTime = "{stm}" and DayOfWeek = "{dow}" and ClassLocation = "{room}";')
             rid = crsr.fetchone()[0]
 
             crsr.close()
@@ -429,7 +434,8 @@ class DBController:
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
             crsr = cnx.cursor()
-            crsr.execute(f'SELECT RequestID,ClassLocation FROM Request WHERE Starttime = {stime} AND DayOfWeek "{dow}";')         # Needs revision to match MySQL data type
+            tme = ""+str(stime[0])+":"+str(stime)+":00"
+            crsr.execute(f'SELECT RequestID,ClassLocation FROM Request WHERE TIMEDIFF(StartTime,"{tme}") = 0 AND (DayOfWeek "{dow}");')
             rloc = crsr.fetchall()
             rllst =[]
             for RequestID, ClassLocation in rloc:
@@ -439,8 +445,10 @@ class DBController:
             
             crsr.close()
             cnx.close()
+            print("rllst",rllst)
             return rllst
         except Exception as e:
+            print(e)
             return "Error"
 
     def getLecRequests(lid):
@@ -505,7 +513,8 @@ class DBController:
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
             crsr = cnx.cursor()
-            crsr.execute(f'SELECT StudentID FROM SATAssignment WHERE RID = {rid} AND StartTime = {stime};')       # Needs revision to match Mysql datetime
+            stm = str(stime[0])+":"+str(stime[1])+":"+str(stime[2])
+            crsr.execute(f'SELECT StudentID FROM SATAssignment WHERE RID = {rid} AND StartTime = "{stm}";')       # Needs revision to match Mysql datetime
             sid = crsr.fetchone()[0]
 
             crsr.close()
@@ -591,7 +600,7 @@ class DBController:
     # Get all equipment available on weekday dow at time tme
     def getAvaile(tme,dow,rtype):
         # print("lavail: ",DBController.lavail)
-        if DBController.lavail == {} and DBController.getall_requests(dow) != []:
+        if DBController.lavail == {} and DBController.getall_requests(dow) == []:
             DBController.setAvailability()
         if rtype == "Laptop":
             return DBController.lavail[dow].getAvailable(tme)       # Need revision all equipment in the dictionary currently no way to tell equipment apart
@@ -607,8 +616,10 @@ class DBController:
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
-            crsr = cnx.cursor()                                                     # NEEDS TO BE REVISED TO FIT MYSQL DATETIME TYPE
-            crsr.execute(f'INSERT INTO SATAssignment (StudentID,RID,sType,DayOfWeek,Starttime,EndTime) VALUES ({sid},{rid},"{dtype},"{dow},{stime},{stime+30}");')
+            crsr = cnx.cursor() 
+            stm = str(stime[0])+":"+str(stime[1])+":"+str(stime[2])
+            etm = str(stime[0]+30)+":"+str(stime[1])+":"+str(stime[2])
+            crsr.execute(f'INSERT INTO SATAssignment (StudentID,RID,sType,DayOfWeek,StartTime,EndTime) VALUES ({sid},{rid},"{dtype}","{dow}","{stm}","{etm}");')
             DBController.savail[dow].markUnavailable(stime,sid)
 
             cnx.commit()

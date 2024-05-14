@@ -12,4 +12,4 @@ class Lecturer:
 
     @staticmethod
     def nxtID():
-        clid += 1
+        Lecturer.clid += 1

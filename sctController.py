@@ -38,9 +38,9 @@ class sctController:
     # Allocate new equipment to a request
     def equip_reallocate(self, rid, etype, stime, etime, dow):
         stme = stime.split(":")
-        stme = [int(s) for s in stme]
+        stme = tuple([int(s) for s in stme])
         etme = etime.split(":")
-        etme = [int(e) for e in etme]
+        etme = tuple([int(e) for e in etme])
 
         evail = lecturerController.get_Equip(stme, etme, [etype], dow)
         if evail:

@@ -9,13 +9,13 @@ class lecturerController:
         return self.instance
 
     def addLecturer(title,name,email,phone):
-        return DBController.add_lecturer(title,name,email,phone)
+        DBController.add_lecturer(title,name,email,phone)
 
     def getLID(email):
         return DBController.getLID(email)
     
     def viewRequests(lid):
-        return DBController.getl_request(lid)
+        return DBController.getall_requests(lid)
 
     def getEquip(stime,etime,elst,dow):
         # Get available equipment
@@ -23,20 +23,21 @@ class lecturerController:
         for e in elst:
             eavail[e] = ()
             for i in range(stime[0],etime[0]):
-                #print("\n\n\n\nLoop starts")
                 val = DBController.getAvaile((stime[0]+i,0),dow,e)
-                #print("Val: ",val)
                 a = (val)
                 if a != ():
-                    eavail[e] = list(set(a) & set(eavail[e]))
+                    if eavail[e] == ():
+                        eavail[e] = a
+                    else:
+                        eavail[e] = tuple(set(a) & set(eavail[e]))
                 else:
                     return False
                 if eavail[e] == ():
                     return False
         # Get one of each type of equipment to assign to the request
         elst = []
-        for eq in eavail:
-            elst += [eq[0]]
+        for eq in eavail.keys():
+            elst += eavail[eq][0]
         return elst
 
     # find the short distance between the buildings
@@ -69,8 +70,9 @@ class lecturerController:
         bldng = DBController.get_Building(rid)
 
         # Get where staff is working around this time (rid,building)
-        rloc = DBController.get_dbController().getl_request(stime,dow)
-        if rloc == False:
+        rloc = DBController.getl_request(stime,dow)
+        #print(stime,dow)
+        if rloc == 'Error':
             return False
         rloc += [(rid,bldng)]
 
@@ -132,6 +134,7 @@ class lecturerController:
     def getSAT(stime,dow):
         # Get available SATs
         sats = DBController.getAvails(stime,dow)
+        #print(sats)
         
         if sats != []:
             return sats[0]
@@ -141,17 +144,20 @@ class lecturerController:
     # Allocate resources to a request
     def allocateR(lid,stime,etime,dow,room,sdate,edate,elst,):
         stme = stime.split(":")
-        stme = [int(s) for s in stme]
+        stme = (int(stme[0]),int(stme[1]))
         etme = etime.split(":")
-        etme = [int(e) for e in etme]
-        rid = DBController.addRequest(lid,stme,etme,dow,room,sdate,edate)
+        etme = (int(etme[0]),int(etme[1]))
+        rid = DBController.addRequest(lid,stime,etime,dow,room,sdate,edate)
+        print("Got RID",rid)
         lst = lecturerController.getEquip(stme,etme,elst,dow)
+        print("Equipment",lst)
         sat = lecturerController.getSAT(stme,dow)
         sat2 = lecturerController.getSAT(etme,dow)
+        print("SAT",sat,sat2)
         if sat != 0 and sat2 != 0 and lst != []:
             for e in lst:
                 DBController.assignEquip(rid,e,stme,etme,dow)
-            DBController.assignSAT(rid,sat,"SU",dow,stme)
+            DBController.assignSAT(rid,sat,"SU",dow,stme,)
             DBController.assignSAT(rid,sat2,"PU",dow,etme)
             return True
         elif sat == 0:
@@ -164,6 +170,6 @@ class lecturerController:
     # Cancellation of a request
     def cancel_request(stime,dow,room):
         stme = stime.split(":")
-        stme = [int(s) for s in stme]
+        stme = (int(stime[0]),int(stime[1]))
         rid = DBController.get_RID(stme,dow,room)
         return DBController.removeRequest(rid)
