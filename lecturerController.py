@@ -1,25 +1,37 @@
 from DBController import DBController
 
 class lecturerController:
+    dis = {}
 
     def __new__(self):
         if not hasattr(self, 'instance'):
             self.instance = super(lecturerController, self).__new__(self)
-            self.dis = {}
         return self.instance
 
-    def getEquip(self,stime,etime,elst,dow):
+    def addLecturer(title,name,email,phone):
+        return DBController.add_lecturer(title,name,email,phone)
+
+    def getLID(email):
+        return DBController.getLID(email)
+    
+    def viewRequests(lid):
+        return DBController.getl_request(lid)
+
+    def getEquip(stime,etime,elst,dow):
         # Get available equipment
         eavail = {}
         for e in elst:
-            eavail[e] = []
+            eavail[e] = ()
             for i in range(stime[0],etime[0]):
-                a = DBController.getAvaile(e,stime+i,dow,e)
-                if a != []:
-                    eavail[e] = list(set(a) & set(eavail))
+                #print("\n\n\n\nLoop starts")
+                val = DBController.getAvaile((stime[0]+i,0),dow,e)
+                #print("Val: ",val)
+                a = (val)
+                if a != ():
+                    eavail[e] = list(set(a) & set(eavail[e]))
                 else:
                     return False
-                if eavail[e] == []:
+                if eavail[e] == ():
                     return False
         # Get one of each type of equipment to assign to the request
         elst = []
@@ -28,7 +40,7 @@ class lecturerController:
         return elst
 
     # find the short distance between the buildings
-    def findDistance(self):
+    def findDistance():
         graph = DBController.getMap()
         nodes = DBController.get_allBuildings()
 
@@ -46,13 +58,13 @@ class lecturerController:
                             distance += [[edge[0],edge[2]+curr[1]]]
                         elif edge[1] == curr[0]:
                             distance += [[edge[1],edge[2]+curr[1]]]
-            self.dis[nd] = {k:v for [k,v] in distance}
+            lecturerController.dis[nd] = {k:v for [k,v] in distance}
 
     # Get shortest distance between two buildings
-    def getDistance(self,b1,b2):
-        return self.dis[b1][b2]
+    def getDistance(b1,b2):
+        return lecturerController.dis[b1][b2]
 
-    def reshuffleSAT(self,rid,stime,dow,dtype):
+    def reshuffleSAT(rid,stime,dow,dtype):
         # Get the building the duty will be on
         bldng = DBController.get_Building(rid)
 
@@ -78,7 +90,7 @@ class lecturerController:
             b = b.union(set(x[1]))
         b = list(b)
 
-        # if no of buildings is less than the no of requests
+        # if no of buildings is less than the no of requests --> change to SAT
         if len(b) < len(rloc):          
             # get the distance between the buildings
             dlst = []
@@ -117,32 +129,41 @@ class lecturerController:
                     for r in req:
                         DBController.assignSAT(r,s,dtype,dow,stime)   
 
-    def getSAT(self,stime,dow):
+    def getSAT(stime,dow):
         # Get available SATs
         sats = DBController.getAvails(stime,dow)
+        
         if sats != []:
             return sats[0]
         else:       
             return 0
-        
-    # Create a similar version to allocate SAT to lab duties
-    def allocateR(self,rid,stime,etime,elst,dow):
-        lst = self.getEquip(stime,etime,elst)
-        sat = self.getSAT(stime,dow)
-        sat2 = self.getSAT(etime,dow)
+    
+    # Allocate resources to a request
+    def allocateR(lid,stime,etime,dow,room,sdate,edate,elst,):
+        stme = stime.split(":")
+        stme = [int(s) for s in stme]
+        etme = etime.split(":")
+        etme = [int(e) for e in etme]
+        rid = DBController.addRequest(lid,stme,etme,dow,room,sdate,edate)
+        lst = lecturerController.getEquip(stme,etme,elst,dow)
+        sat = lecturerController.getSAT(stme,dow)
+        sat2 = lecturerController.getSAT(etme,dow)
         if sat != 0 and sat2 != 0 and lst != []:
             for e in lst:
-                DBController.assignEquip(rid,e,stime,etime,dow)
-            DBController.assignSAT(rid,sat,"SU",dow,stime)
-            DBController.assignSAT(rid,sat2,"PU",dow,etime)
+                DBController.assignEquip(rid,e,stme,etme,dow)
+            DBController.assignSAT(rid,sat,"SU",dow,stme)
+            DBController.assignSAT(rid,sat2,"PU",dow,etme)
             return True
         elif sat == 0:
-            return self.reshuffleSAT(rid,stime,dow,'SU')
-        elif sat2 == 0:
-            return self.reshuffleSAT(rid,etime,dow,'PU')
+            if not lecturerController.reshuffleSAT(rid,stme,dow,'SU'):
+                return False
+        if sat2 == 0:
+            if not lecturerController.reshuffleSAT(rid,etme,dow,'PU'):
+                return False
         
     # Cancellation of a request
-    def cancel_request(self):
-        pass
-        
-    # Updating a request
+    def cancel_request(stime,dow,room):
+        stme = stime.split(":")
+        stme = [int(s) for s in stme]
+        rid = DBController.get_RID(stme,dow,room)
+        return DBController.removeRequest(rid)

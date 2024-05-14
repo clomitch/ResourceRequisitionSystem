@@ -18,8 +18,7 @@ CREATE TABLE Equipment (
 -- Lecturer Table
 CREATE TABLE Lecturer(
     LecturerID int PRIMARY KEY,
-    FirstName varchar(50),
-    LastName varchar(50),
+    flname varchar(100),
     Title varchar(3),
     Email varchar(50),
     Telephone varchar(10)

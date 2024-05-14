@@ -1,20 +1,24 @@
 class Request:
+    crid = 0
 
     #Constructor
-    def __init__(self,stime,etime,room):
-        #self.rid = rid              # request ID
-        self.sup = []               # IDs of staff and equipment being provided
-        self.stime = stime          # Start time
-        self.etime = etime          # End time
-        self.room = room            # Location of event/class
-        #self.building = building    # Building the room is on
+    def __init__(self,lid,stime,etime,room,dow,sdate,edate):
+        Request.nxtRID()
+        self.rid = Request.crid          # request ID
+        self.LID = lid                   # lecturer's ID
+        self.stime = stime               # Start time
+        self.etime = etime               # End time
+        self.room = room                 # Location of event/class
+        self.dow = dow
+        self.sdate = sdate               # Start date
+        self.edate = edate               # End date
 
-    def provSup(self,resID):
-        self.sup += resID
-        # update database to reflect changes
-
-    def getID(self):
-        return self.ID
+    @staticmethod
+    def nxtRID():
+        Request.crid += 1
+    
+    def getID():
+        return Request.ID
 
     def get_stime(self):
         return self.stime 
@@ -24,6 +28,3 @@ class Request:
     
     def get_room(self):
         return self.room
-    
-    def toString(self):
-        return " "

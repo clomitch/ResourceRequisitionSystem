@@ -20,29 +20,36 @@ class sctController:
         return DBController.addEquip(eid,rtype)
 
     # Remove Equipment
-    def remove_equip(eid):
-        return DBController.removeEquip(eid)
+    def remove_equip(rtype,eid):
+        return DBController.removeEquip(rtype,eid)
     
     # Get all SAT
     def getSAT():
         return DBController.getall_sat()
     
+    # Get all SATs
     def addSAT(sid,fname,lname):
         return DBController.addSAT(sid,fname,lname)
     
+    # Fire SAT with ID sid
     def removeSAT(sid):
         return DBController.removeSAT(sid)
 
     # Allocate new equipment to a request
     def equip_reallocate(self, rid, etype, stime, etime, dow):
-        evail = lecturerController.get_Equip(stime, etime, [etype], dow)
+        stme = stime.split(":")
+        stme = [int(s) for s in stme]
+        etme = etime.split(":")
+        etme = [int(e) for e in etme]
+
+        evail = lecturerController.get_Equip(stme, etme, [etype], dow)
         if evail:
             for e in evail:
-                DBController.assignEquip(rid, e, stime, etime, dow)
+                DBController.assignEquip(rid, e, stme, etme, dow)
             return True
         else:
             # If the equipment is not available, try to reshuffle
-            return self.reshuffleEquip(rid, etype, stime, etime, dow)
+            return self.reshuffleEquip(rid, etype, stme, etme, dow)
 
     def reshuffleEquip(self, rid, etype, stime, etime, dow):
         # Try to find any alternative equipment available at the same time

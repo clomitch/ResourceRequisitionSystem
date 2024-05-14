@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from sctController import sctController
 from lecturerController import lecturerController
 from satController import satController
-import Request
 
 app = Flask(__name__)
 
@@ -22,9 +21,9 @@ def add_equipment():
     return jsonify({"message": mes})
 
 # Remove Equipment
-@app.route('/remove_equipment/<int:id>', methods=['DELETE'])
-def delete_equipment(id):
-    mes = sctController.remove_equip(id)
+@app.route('/remove_equipment/<string:rtype>/<int:id>', methods=['DELETE'])
+def delete_equipment(rtype,id):
+    mes = sctController.remove_equip(rtype,id)
     return jsonify({"message": mes})
 
 # Get all SAT
@@ -49,38 +48,27 @@ def delete_student_staff(id):
 App routes for the Lecturer page
 '''
 # Submit Support request
-app.route('/submit_request', methods=['POST'])
+@app.route('/submit_request', methods=['POST'])
 def schedule_tech_item():
-    # Extracting form data
-    data = {
-        "request_type": request.form.get('requestType'),
-        "title": request.form.get('title'),
-        "full_name": request.form.get('fullName'),
-        "email": request.form.get('email'),
-        "mobile": request.form.get('mobile'),
-        "department": request.form.get('department'),
-        "course_or_event": request.form.get('courseOrEvent'),
-        "room_assigned": request.form.get('roomAssigned'),
-        "day_of_week": request.form.get('dayOfWeek'),
-        "start_date": request.form.get('startDate'),
-        "end_date": request.form.get('endDate'),
-        "start_time": request.form.get('startTime'),
-        "end_time": request.form.get('endTime'),
-        "equipment_request": request.form.get('equipmentRequest')
-    }
-    # rid,stime,etime,elst,dow          rid,stime,etime,room,building
-    if data['request_type'] == 'New':
-        req = Request(data['start_time'],data['end_time'],data['room_assigned'])        # Needs revision the request class needs more details
-        mes = lecturerController.allocateR(req.getID(),req.get_stime(),req.get_etime,data['equipment_request'],data['day_of_week'])
-        if mes:
-            return jsonify({"success": True, "message": "Tech item scheduled successfully!"})
-    elif data['request_type'] == 'Cancellation':
-        pass        # Write cancellation function in lecturer controller
+    data = request.get_json()
+    #print('got the data')
+    # lid,stime,etime,room,sdate,edate          stime,etime,elst,dow)
+    if data['Request Type'] == 'New':
+        lid = lecturerController.getLID(data['Email'])      # Needs revision the request class needs more details
+        if lid == 0:
+            lecturerController.addLecturer(data['Title'],data['Full Name'],data['Email'],data['Mobile'])
+        lecturerController.allocateR(lid,data['Start Time'],data['End Time'],data['Day Of Week'],data["Room Assigned"],data["Start Date"],data['End Date'],data['Equipment Needed'])    
     else:
-        # It is an update to a request
-        pass
+        lecturerController.cancel_request(data['Day Of Week'],data['Start Time'],data['Room Assigned'])
+        if data['request_type'] == 'Update':
+            lecturerController.allocateR(lid,data['Start Time'],data['End time'],data['Day Of Week'],data["Room Assigned"],data["Start Date"],data['End Date'],data['Equipment Needed'])
 
-    return jsonify({"success": True, "message": "Tech item scheduled successfully!"})
+    return jsonify({"success": True, "message": "Request submitted/nCheck email for denial/approval of your request"})
+
+# View requests made by a Lecturer
+@app.route('/view_requests/<int:lid>')
+def viewRequests(lid):
+    return lecturerController.viewRequests(lid)
 
 '''
 App routes for the student staff page
@@ -97,6 +85,11 @@ def submit_availability():
 @app.route('/getAvailableTimes/<int:sid>',methods=['GET'])
 def get_times(sid):
     return satController.getTimesSub(sid)
+
+# Delete Available Times submitted
+@app.route('/remove_availability/<int:sid>/<string:dow>/<string:stime>', methods=['DELETE'])
+def removeTime(sid,dow,stime):
+    return satController.remove_availability(sid,stime,dow)
 
 if __name__ == '__main__':
     app.run(debug=True)
