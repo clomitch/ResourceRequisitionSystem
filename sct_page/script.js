@@ -5,7 +5,7 @@ let studentStaffData = [];
 
 // Fetch Equipment Data from Flask
 function fetchEquipmentData() {
-    fetch('/get_equipment')
+    fetch('/sct_page/script.js/get_equipment')
         .then(response => response.json())
         .then(data => {
             equipmentData = data;
@@ -16,7 +16,7 @@ function fetchEquipmentData() {
 
 // Fetch Student Staff Data from Flask
 function fetchStudentStaffData() {
-    fetch('/get_student-staff')
+    fetch('/sct_page/script.js/get_student-staff')
         .then(response => response.json())
         .then(data => {
             studentStaffData = data;
@@ -102,7 +102,7 @@ function addEquipment() {
         Type: newSpecs
     };
 
-    fetch('/add_equipment', {
+    fetch('/sct_page/script.js/add_equipment', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -132,7 +132,7 @@ function addStudentStaff() {
         'Last Name': newName.split(' ')[1],
     };
 
-    fetch('/add_student-staff', {
+    fetch('/sct_page/script.js/add_student-staff', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -196,7 +196,7 @@ function removeEquipment(itemId) {
     const confirmed = confirm('This action will remove the equipment. Press "OK" to proceed or "Cancel" to cancel.');
 
     if (confirmed) {
-        fetch(`/remove_equipment/${itemId}`, {
+        fetch(`/sct_page/script.js/remove_equipment/${itemId}`, {
             method: 'DELETE'
         })
         .then(response => response.json())
@@ -215,7 +215,7 @@ function removeStudentStaff(itemId) {
     const confirmed = confirm('This action will remove the student staff. Press "OK" to proceed or "Cancel" to cancel.');
 
     if (confirmed) {
-        fetch(`/remove_student-staff/${itemId}`, {
+        fetch(`/sct_page/script.js/remove_student-staff/${itemId}`, {
             method: 'DELETE'
         })
         .then(response => response.json())
