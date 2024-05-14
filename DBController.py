@@ -268,7 +268,7 @@ class DBController:
             cnx.close()
             return elst
         except Exception as e:
-            print(e)
+            #print(e)
             return "Error"
 
     # Get all SAT from the table Student Staff
@@ -410,7 +410,7 @@ class DBController:
             return rid
         except Exception as e:
             return "Error"
-        
+    ''' 
     def getLID(email):
         try: 
             cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
@@ -427,7 +427,7 @@ class DBController:
             return lid
         except Exception as e:
             return "Error"
-
+    '''   
     # Get requests and their location from Requests
     def getl_request(stime,dow):
         try: 
@@ -450,7 +450,7 @@ class DBController:
             print("rllst",rllst)
             return rllst
         except Exception as e:
-            print(e)
+            #print(e)
             return "Error"
 
     def getLecRequests(lid):
@@ -592,11 +592,33 @@ class DBController:
         DBController.lavail = {k: Availability('Laptop',DBController.getall_equip('Laptop')) for k in dows}
         DBController.pavail = {k: Availability('Projector',DBController.getall_equip('Projector')) for k in dows}
         DBController.savail = {k: Availability('SAT',[]) for k in ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']}
+        try: 
+            cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
+                                    host='localhost',
+                                    auth_plugin='mysql_native_password',
+                                    database='projectdb')
+            crsr = cnx.cursor() 
+            crsr.execute(f'SELECT StudentID, DayOfWeek, StartTime FROM SATAvailability;')
+            satavail = crsr.fetchall()
+        
+            for sid, dow, stime in satavail:
+                stm = stime.split(":")
+                DBController.savail[dow].addSATavail(sid,int(stm))
+
+            cnx.commit()
+            crsr.close()
+            cnx.close()
+            
+        except Exception as e:
+            print("Error")
+        
 
     # Get all SAT available on weekday dow at time tme
     def getAvails(tme,dow):
-        if DBController.savail == {} and DBController.getall_requests(dow) != []:
+        if DBController.savail == {} and DBController.getall_requests(dow) == []:
             DBController.setAvailability()
+
+        print(DBController.savail)
         return DBController.savail[dow].getAvailable(tme)
 
     # Get all equipment available on weekday dow at time tme
@@ -632,8 +654,9 @@ class DBController:
             return "Error"
 
     # Assign Equipment with id eid to request with id rid  
-    def assignEquip(self,rid,eid,stime,etime,dow,rtype):
+    def assignEquip(rid,eid,stime,etime,dow,rtype):
         try: 
+            print("Equip",eid)
             cnx = mysql.connector.connect(user='RRSuser', password='f$$RRsystem24',
                                     host='localhost',
                                     auth_plugin='mysql_native_password',
@@ -643,14 +666,15 @@ class DBController:
             
             if rtype == 'Laptop':
                 for i in range(stime,etime):
-                    self.lavail[dow].markUnavailable(i,eid)
+                    DBController.lavail[dow].markUnavailable(i,eid)
             else:
                 for i in range(stime,etime):
-                    self.pavail[dow].markUnavailable(i,eid)
+                    DBController.pavail[dow].markUnavailable(i,eid)
 
             cnx.commit()
             crsr.close()
             cnx.close()
+            
             return "Equipment Assigned"
         except Exception as e:
             return "Error"

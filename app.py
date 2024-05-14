@@ -54,11 +54,8 @@ def schedule_tech_item():
     #print('got the data')
     # lid,stime,etime,room,sdate,edate          stime,etime,elst,dow)
     if data['Request Type'] == 'New':
-        lid = lecturerController.getLID(data['Email'])
-        if lid == None:
-            lecturerController.addLecturer(data['Title'],data['Full Name'],data['Email'],data['Mobile'])
-            lid = lecturerController.getLID(data['Email'])
-        lecturerController.allocateR(lid,data['Start Time'],data['End Time'],data['Day Of Week'],data["Room Assigned"],data["Start Date"],data['End Date'],data['Equipment Needed'])    
+        lecturerController.addLecturer(data['Title'],data['Full Name'],data['Email'],data['Mobile'])
+        lecturerController.allocateR(data['LecturerID'],data['Start Time'],data['End Time'],data['Day Of Week'],data["Room Assigned"],data["Start Date"],data['End Date'],data['Equipment Needed'])    
     else:
         lecturerController.cancel_request(data['Day Of Week'],data['Start Time'],data['Room Assigned'])
         if data['request_type'] == 'Update':

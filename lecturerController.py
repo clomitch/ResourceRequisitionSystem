@@ -37,7 +37,7 @@ class lecturerController:
         # Get one of each type of equipment to assign to the request
         elst = []
         for eq in eavail.keys():
-            elst += eavail[eq][0]
+            elst += [eavail[eq][0]]
         return elst
 
     # find the short distance between the buildings
@@ -134,8 +134,7 @@ class lecturerController:
     def getSAT(stime,dow):
         # Get available SATs
         sats = DBController.getAvails(stime,dow)
-        #print(sats)
-        
+        print(sats)
         if sats != []:
             return sats[0]
         else:       
@@ -148,15 +147,13 @@ class lecturerController:
         etme = etime.split(":")
         etme = (int(etme[0]),int(etme[1]))
         rid = DBController.addRequest(lid,stime,etime,dow,room,sdate,edate)
-        print("Got RID",rid)
         lst = lecturerController.getEquip(stme,etme,elst,dow)
-        print("Equipment",lst)
         sat = lecturerController.getSAT(stme,dow)
         sat2 = lecturerController.getSAT(etme,dow)
-        print("SAT",sat,sat2)
+        #print("SAT",sat,sat2)
         if sat != 0 and sat2 != 0 and lst != []:
             for e in lst:
-                DBController.assignEquip(rid,e,stme,etme,dow)
+                DBController.assignEquip(rid,e[0],stme,etme,dow,e[1])
             DBController.assignSAT(rid,sat,"SU",dow,stme,)
             DBController.assignSAT(rid,sat2,"PU",dow,etme)
             return True
