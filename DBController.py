@@ -87,9 +87,10 @@ class DBController:
         # Add availability to dictionary structure
         if DBController.savail == {}:
             DBController.setAvailability()
-        for i in range((etime[0])-stime[0]):
+        for i in range((etime[0]),stime[0]):
             for j in range(4):
-                DBController.savail[dow].addSATavail(sid,(stime[0]+i,stime[1]+(j*15)))
+                if stime[1]+(j*15) < 60:
+                    DBController.savail[dow].addSATavail(sid,(stime[0]+i,stime[1]+(j*15)))
         
         # Add to the database
         try:
@@ -98,16 +99,25 @@ class DBController:
                                     auth_plugin='mysql_native_password',
                                     database='projectdb')
             crsr = cnx.cursor()
-            stm = str(stime[0])+":"+str(stime[1])+":"+str(stime[2])
-            etm = str(etime[0])+":"+str(etime[1])+":"+str(etime[2])
-            crsr.execute(f'INSERT INTO SATAvailability (StudentID,DayOfWeek,StartTime,EndTime) VALUES ({sid},"{dow}","{stm}","{etm}");')
+            for i in range(stime[0],etime[0]):  #stime[1]+(j*15)
+                mins = stime[1]
+                for j in range(4):
+                    if mins < 45:
+                        stm = str(i)+":"+str(mins)+":00"
+                        mins += 15*j
+                        etm = str(i)+":"+str(mins)+":00"
+                        crsr.execute(f'INSERT INTO SATAvailability (StudentID,DayOfWeek,StartTime,EndTime) VALUES ({sid},"{dow}","{stm}","{etm}");')
+                    elif mins == 45:
+                        stm = str(i)+":"+str(mins)+":00"
+                        etm = str(i+1)+":00:00"
+                        crsr.execute(f'INSERT INTO SATAvailability (StudentID,DayOfWeek,StartTime,EndTime) VALUES ({sid},"{dow}","{stm}","{etm}");')
         
             cnx.commit()
             crsr.close()
             cnx.close()
             return "Availability added Successfully"
         except Exception as e:
-            #print(e)
+            print(e)
             return "Error\nDatabase was not updated"
 
     def addRequest(lid,stime,etime,dow,room,sdate,edate):
@@ -602,23 +612,21 @@ class DBController:
             satavail = crsr.fetchall()
         
             for sid, dow, stime in satavail:
-                stm = stime.split(":")
-                DBController.savail[dow].addSATavail(sid,int(stm))
+                stm = str(stime).split(":")
+                DBController.savail[dow].addSATavail(sid,(int(stm[0]),int(stm[1])))
 
             cnx.commit()
             crsr.close()
             cnx.close()
             
         except Exception as e:
-            print("Error")
+            print(e)
         
 
     # Get all SAT available on weekday dow at time tme
     def getAvails(tme,dow):
         if DBController.savail == {} and DBController.getall_requests(dow) == []:
             DBController.setAvailability()
-
-        print(DBController.savail)
         return DBController.savail[dow].getAvailable(tme)
 
     # Get all equipment available on weekday dow at time tme

@@ -59,7 +59,7 @@ def schedule_tech_item():
     else:
         lecturerController.cancel_request(data['Day Of Week'],data['Start Time'],data['Room Assigned'])
         if data['request_type'] == 'Update':
-            lecturerController.allocateR(lid,data['Start Time'],data['End time'],data['Day Of Week'],data["Room Assigned"],data["Start Date"],data['End Date'],data['Equipment Needed'])
+            lecturerController.allocateR(data['LecturerID'],data['Start Time'],data['End time'],data['Day Of Week'],data["Room Assigned"],data["Start Date"],data['End Date'],data['Equipment Needed'])
 
     return jsonify({"success": True, "message": "Request submitted\nCheck email for denial/approval of your request"})
 

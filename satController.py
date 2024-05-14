@@ -7,7 +7,7 @@ class satController:
         stme = stime.split(":")
         stme = tuple([int(s) for s in stme])
         etme = etime.split(":")
-        etme = tuple([int(e) for e in etme])
+        etme = tuple([int(e) for e in etme])  
         return DBController.addAvailability(sid,stme,etme,dow)
     
     def getTimesSub(sid):          # Maybe switch to ID by adding a login feature

@@ -24,7 +24,7 @@ class Availability:
         self.avail[time] += [sid]
 
     def getAvailable(self,time):
-        #print(self.avail)
+        print(self.avail)
         return self.avail[time]
     
     def markUnavailable(self,time,rsrc):
