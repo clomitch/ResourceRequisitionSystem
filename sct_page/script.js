@@ -1,14 +1,29 @@
-// Dummy data for equipment and student staff
-let equipmentData = [
-    { id: 1, name: 'Projector', quantity: 5, specifications: 'NexiGo PJ40' },
-    { id: 2, name: 'Laptop', quantity: 3, specifications: 'Asus Vivobook X15' },
-    { id: 3, name: 'Microphone', quantity: 8, specifications: 'JYX Wired' }
-];
-let studentStaffData = [
-    { id: 101, name: 'John Doe', contact: 'john@mymona.edu.jm' },
-    { id: 102, name: 'Jane Smith', contact: 'jane@mymona.edu.jm' },
-    { id: 103, name: 'Bob Johnson', contact: 'bob@mymona.edu.jm' }
-];
+//This is the updated  of script.js in sct_page version that implements Fetch API
+
+let equipmentData = [];
+let studentStaffData = [];
+
+// Fetch Equipment Data from Flask
+function fetchEquipmentData() {
+    fetch('/get_equipment')
+        .then(response => response.json())
+        .then(data => {
+            equipmentData = data;
+            populateEquipmentTable();
+        })
+        .catch(error => console.error('Error fetching equipment data:', error));
+}
+
+// Fetch Student Staff Data from Flask
+function fetchStudentStaffData() {
+    fetch('/get_student-staff')
+        .then(response => response.json())
+        .then(data => {
+            studentStaffData = data;
+            populateStudentStaffTable();
+        })
+        .catch(error => console.error('Error fetching student staff data:', error));
+}
 
 // Function to populate equipment table
 function populateEquipmentTable() {
@@ -83,14 +98,25 @@ function addEquipment() {
     if (!newSpecs) return alert('Specifications are required.');
 
     const newEquipment = {
-        id: generateUniqueId('equipment'),
-        name: newName,
-        quantity: newQuantity,
-        specifications: newSpecs
+        EquipmentID: generateUniqueId('equipment'),
+        Type: newSpecs
     };
-    equipmentData.push(newEquipment);
-    populateEquipmentTable();
+
+    fetch('/add_equipment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newEquipment)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        fetchEquipmentData();
+    })
+    .catch(error => console.error('Error adding equipment:', error));
 }
+
 
 // Function to add student staff
 function addStudentStaff() {
@@ -101,13 +127,26 @@ function addStudentStaff() {
     if (!newContact) return alert('Contact information is required.');
 
     const newStudentStaff = {
-        id: generateUniqueId('studentStaff'),
-        name: newName,
-        contact: newContact
+        StudentID: generateUniqueId('studentStaff'),
+        'First Name': newName.split(' ')[0],
+        'Last Name': newName.split(' ')[1],
     };
-    studentStaffData.push(newStudentStaff);
-    populateStudentStaffTable();
+
+    fetch('/add_student-staff', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newStudentStaff)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        fetchStudentStaffData();
+    })
+    .catch(error => console.error('Error adding student staff:', error));
 }
+
 
 // Get reference to the "Add Equipment" and "Add Student Staff" button // Attach event listener to the button
 const equipmentButton = document.getElementById('equipmentButton');
@@ -154,16 +193,18 @@ function modifyStudentStaff(itemId) {
 
 // Function to remove equipment
 function removeEquipment(itemId) {
-   
     const confirmed = confirm('This action will remove the equipment. Press "OK" to proceed or "Cancel" to cancel.');
 
     if (confirmed) {
-        const index = equipmentData.findIndex(item => item.id === itemId);
-
-        if (index !== -1) {
-            equipmentData.splice(index, 1);
-            populateEquipmentTable();
-        }
+        fetch(`/remove_equipment/${itemId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            fetchEquipmentData();
+        })
+        .catch(error => console.error('Error removing equipment:', error));
     } else {
         alert('Removal canceled. The equipment was not removed.');
     }
@@ -171,21 +212,23 @@ function removeEquipment(itemId) {
 
 // Function to remove student staff
 function removeStudentStaff(itemId) {
-    // Ask for confirmation before removing student staff
     const confirmed = confirm('This action will remove the student staff. Press "OK" to proceed or "Cancel" to cancel.');
 
     if (confirmed) {
-        const index = studentStaffData.findIndex(item => item.id === itemId);
-
-        if (index !== -1) {
-            studentStaffData.splice(index, 1);
-            populateStudentStaffTable();
-        }
+        fetch(`/remove_student-staff/${itemId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            fetchStudentStaffData();
+        })
+        .catch(error => console.error('Error removing student staff:', error));
     } else {
-        
         alert('Removal canceled. The student staff was not removed.');
     }
 }
+
 
 function generateUniqueId(type) {
     const prefix = (type === 'equipment') ? 'E' : 'S';
